@@ -1,9 +1,10 @@
-# KonnectR - Academic & Professional Networking Platform
+# KonnectR - Job Board and Networking Platform for R&D Enthusiasts
 
-![KonnectR Logo](/img/konnectr_logo.png)
+
+![KonnectR Logo](/img/KonnectR_logo.svg)
 
 ## Team Members
-- Pavan Yellathakota - Developer
+- Design & Developed by - PAVAN YELLATHAKOTA.
 
 ## Project Narrative
 KonnectR is an innovative networking platform designed to bridge the gap between academia and industry. The platform facilitates meaningful connections between students, professors, and industry professionals, enabling collaboration on research projects, job opportunities, and knowledge sharing.
@@ -17,7 +18,6 @@ The application serves as a centralized hub where:
 ## Primary Use Cases & User Roles
 
 ### User Roles Overview
-![User Roles Diagram](/img/user_roles.png)
 
 1. **Students**
    - Search for research projects and job opportunities
@@ -67,28 +67,163 @@ The application serves as a centralized hub where:
 | Student            | paone@zurich.edu                | Qwerty@123    | Moderate     |
 | Company Recruiter  | harithra@google.com             | Qwerty@123    | Moderate     |
 
+# KonnectR Platform Overview :
+
+KonnectR is a comprehensive platform designed for Research and Development enthusiasts across academic, professional, and startup ecosystems. It serves as both a job board and a networking platform.
+
+## User and Admin Interfaces
+
+### User Interface:
+- **Post Management**: Users can create and manage their posts.
+- **Networking**: Users can connect with other users, build their network, and engage in messaging to share thoughts.
+- **Profile Management**: Users can update certain fields in their profiles to keep information current.
+
+### Admin Interface:
+- **Platform Monitoring**: The admin has full control over the platform, with the ability to monitor user and application traffic.
+- **User and Post Management**: The admin can modify user statuses, manage post statistics, and oversee platform activities.
+- **Data Insights**: The admin dashboard provides data insights, allowing the admin to observe trends and analyze platform metrics.
+
+### Front-End:
+- **HTML5**, **CSS**, and **Bootstrap**: Used for building an interactive, responsive UI.
+- **JavaScript**: Adds interactivity and dynamic features to the platform.
+- **Jinja Templates**: Used for rendering dynamic content with the Flask back-end.
+
+### Back-End:
+- **Python**: The core programming language powering the application.
+- **Flask**: A lightweight web framework that helps manage the routing, user paths, and server-side logic.
+- **MySQL (MyISAM)**: Chosen for data storage due to its efficiency in handling non-referential integrity relationships.
+
+### Features:
+- **User Sessions**: Maintains the user session across the platform until sign-out.
+- **Encryption**: Utilizes the MD5 hashing algorithm to protect user passwords.
+- **RESTful APIs**: Facilitates seamless data transfer across the platform with JSON format.
+
 ## Key SQL Queries
+## Transactional Queries
 
-### Transactional Queries
-1. Post Creation & Management
-   - `create_post()` - Insert new posts
-   - `update_post()` - Update existing posts
-   - `toggle_post_status()` - Activate/deactivate posts
+### 1. Post Creation & Management
+Users can effortlessly manage their posts on the platform. They have the ability to:
+- Create new posts to showcase opportunities.
+- Edit existing posts to keep content up-to-date.
+- Delete posts that are no longer relevant.
 
-2. User Interactions
-   - `handle_application()` - Process job applications
-   - `toggle_follow()` - Manage user connections
-   - `save_post()` - Save posts for later
+This feature ensures that the platform remains dynamic and accurate.
 
-### Analytical Queries
-1. Dashboard Analytics
-   - `get_field_analytics()` - Field-wise interaction analysis
-   - `get_user_activity_analytics()` - User engagement metrics
-   - `get_growth_analytics()` - Platform growth trends
+![Creating new Posts](/img/create_post.png)
 
-2. User Analysis
-   - `get_user_type_analytics()` - User type distribution
-   - `get_post_interaction_stats()` - Post engagement metrics
+![Managing Posts](/img/manage_posts.png)
+
+### 2. User Interactions
+Users can interact with each other seamlessly through:
+- **Asynchronous Chat:** Enabling users to connect and communicate throughout their sessions.
+- **Search and Network Building:** Users can search for others on the platform and build their network by following peers, recruiters, and professors, fostering a collaborative environment.
+
+![Messaging](/img/Chat1.png)
+
+![Connections](/img/peers.png)
+
+---
+
+## Analytical Queries
+
+### 1. Dashboard Analytics
+Admins have access to a dedicated dashboard offering a comprehensive overview of platform performance. The dashboard includes:
+- **Platform Statistics:** Total number of users and posts created.
+- **Recent Activities:** Highlights of recently joined users and latest posts.
+- **User Inflow Monitoring:** Tracks the number of new users joining daily, weekly, monthly, or yearly.
+- **Post Analysis:** Displays the frequency of posts created over specific time periods.
+
+![Application Statistics](/img/App_stats.png)
+
+![Recent Activities on Application](/img/Recent_activity.png)
+
+#### Example Queries:
+
+- `get_field_analytics()` - Field-wise interaction analysis:
+
+```sql
+SELECT 
+    p.field_of_interest,
+    COUNT(DISTINCT p.post_id) as post_count,
+    COALESCE(SUM(pa.apply_count), 0) as apply_count,
+    COALESCE(SUM(pa.save_count), 0) as save_count,
+    COALESCE(SUM(pa.view_count), 0) as view_count
+FROM Posts p
+LEFT JOIN Post_Analytics pa ON p.post_id = pa.post_id
+WHERE p.deleted = 0
+GROUP BY p.field_of_interest
+ORDER BY p.field_of_interest;
+```
+
+- `get_user_activity_analytics()` - User engagement metrics:
+
+```sql
+SELECT 
+    DATE_FORMAT(last_login, %s) as period,
+    COUNT(DISTINCT user_id) as active_users,
+    AVG(TIMESTAMPDIFF(MINUTE, last_login, last_logout)) as avg_session_duration
+FROM Users
+WHERE last_login IS NOT NULL 
+AND last_logout IS NOT NULL
+AND deleted = 0
+GROUP BY period
+ORDER BY period DESC
+LIMIT 12;
+```
+
+- `get_growth_analytics()` - Platform growth trends:
+
+```sql
+SELECT 
+    DATE_FORMAT(created_at, '%Y-%m') as month,
+    COUNT(*) as new_users
+FROM Users
+WHERE deleted = 0
+GROUP BY month
+ORDER BY month
+LIMIT 12;
+```
+
+### 2. User Analysis
+Admins can analyze platform usage and user behavior through:
+- **Active User Monitoring:** Review login and logout records to identify active users.
+- **User Interest and Engagement:** Gain insights into the user types (students, professors, recruiters) who are most likely to join and actively engage with the platform.
+
+![User Statistics](/img/User_stats.png)
+
+![Active Users](/img/Active_users_stats.png)
+
+#### Example Queries:
+
+- `get_user_type_analytics()` - User type distribution:
+
+```sql
+SELECT 
+    user_type,
+    COUNT(*) as total_users,
+    SUM(CASE WHEN last_login >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as active_users,
+    SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as new_users,
+    AVG(login_count) as avg_logins
+FROM Users
+WHERE deleted = 0 AND user_type != 'Admin'
+GROUP BY user_type;
+```
+
+- `get_field_interaction_stats()` - Post engagement metrics:
+
+```sql
+SELECT 
+    pa.field_of_interest,
+    SUM(pa.view_count) as total_views,
+    SUM(pa.apply_count) as total_applies,
+    SUM(pa.save_count) as total_saves,
+    COUNT(DISTINCT p.post_id) as post_count
+FROM Post_Analytics pa
+JOIN Posts p ON pa.post_id = p.post_id
+WHERE p.deleted = 0
+GROUP BY pa.field_of_interest
+ORDER BY total_applies DESC;
+
 
 ## Tech Stack
 - Backend: Python Flask
@@ -107,11 +242,9 @@ The application serves as a centralized hub where:
 - Post moderation system
 
 ## Security Features
-- Password hashing (SHA-256)
+- Password hashing (MD5)
 - Session management
-- CSRF protection
 - Input validation
-- XSS prevention
 
 ## Installation & Setup
 
@@ -154,6 +287,9 @@ KONNECTR/
 ├── templates/              # HTML templates
 ├── *.py                    # Python backend files
 └── requirements.txt        # Dependencies
+
+For the complete Flask project structure, refer to `KONNECTR.aurdino`
+
 ```
 
 ## License
@@ -166,3 +302,9 @@ Please read CONTRIBUTING.md for contribution guidelines.
 - Bootstrap for UI components
 - Plotly.js for analytics visualization
 - Flask community for excellent documentation
+
+
+## Contact
+- Email: pavanyellathakota@gmail.com
+- GitHub: https://github.com/PavanYellathakota
+- LinkedIn: https://www.linkedin.com/in/pavanyellathakota/

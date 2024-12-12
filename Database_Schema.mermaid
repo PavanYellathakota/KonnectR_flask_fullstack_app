@@ -1,0 +1,103 @@
+erDiagram
+    USERS {
+        int user_id PK
+        string username
+        string email
+        string hashed_password
+        datetime created_at
+        string user_type
+        string org_name FK
+        int org_id FK
+        string majors
+        string level_of_study
+        boolean deleted
+        string location
+        string skills
+        string experience
+        datetime last_logout
+        datetime last_login
+        int login_count
+    }
+
+    FOLLOWERS {
+        int follower_id PK
+        int followed_id FK
+        datetime followed_at
+    }
+
+    MESSAGES {
+        int message_id PK
+        int sender_id FK
+        int receiver_id FK
+        text message_text
+        datetime sent_at
+        boolean read_status
+        boolean deleted
+        boolean pinned
+    }
+
+    ORGANIZATIONS {
+        int org_id PK
+        string org_name
+        string org_logo
+        string org_type
+    }
+
+    POST_ANALYTICS {
+        int analytics_id PK
+        int post_id FK
+        int view_count
+        int apply_count
+        int save_count
+        string field_of_interest
+        datetime created_at
+    }
+
+    POST_INTERACTIONS {
+        int interaction_id PK
+        int user_id FK
+        int post_id FK
+        string interaction_type
+        datetime created_at
+    }
+
+    POSTS {
+        int post_id PK
+        int user_id FK
+        string title
+        text description
+        string post_type
+        datetime post_created_at
+        string status
+        string field_of_interest
+        string source_url
+        boolean deleted
+    }
+
+    SAVED_POSTS {
+        int saved_id PK
+        int post_id FK
+        int user_id FK
+        datetime saved_at
+    }
+
+    PASSWORD_RESETS {
+        int pass_id PK
+        string email
+        string status
+        datetime created_at
+        datetime processed_at
+        string processed_by
+    }
+
+    USERS ||--o{ FOLLOWERS : "follows"
+    USERS ||--o{ MESSAGES : "sends/receives"
+    ORGANIZATIONS ||--o{ USERS : "employs"
+    USERS ||--o{ POSTS : "creates"
+    POSTS ||--o{ POST_ANALYTICS : "analyzes"
+    USERS ||--o{ POST_INTERACTIONS : "interacts"
+    POSTS ||--o{ POST_INTERACTIONS : "has"
+    USERS ||--o{ SAVED_POSTS : "saves"
+    POSTS ||--o{ SAVED_POSTS : "saved_by"
+    PASSWORD_RESETS ||--o| USERS : "resets_password"
+    ORGANIZATIONS ||--|{ USERS : "affiliated"
