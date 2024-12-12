@@ -1,0 +1,423 @@
+<!-- templates/peers.html -->
+{% extends "base.html" %}
+{% block title %}Peers{% endblock %}
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if not request.args.get('_') %}  
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="mb-0">Find Peers</h2>
+            <p class="text-muted small mb-0">Connect with students, professors, and professionals</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary d-flex align-items-center gap-2" 
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#advancedSearch"
+                    aria-expanded="{{ 'true' if filters.user_type or filters.org_id else 'false' }}"
+                    aria-controls="advancedSearch">
+                <i class="bi bi-funnel"></i> 
+                Advanced Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section mb-4">
+        <!-- Basic Search -->
+        <form method="GET" class="mb-3">
+            <div class="input-group input-group-lg shadow-sm">
+                <span class="input-group-text bg-transparent border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" 
+                       name="search_query"
+                       class="form-control border-start-0 ps-0" 
+                       placeholder="Search peers by name or organization..."
+                       value="{{ filters.search_query or '' }}"
+                       aria-label="Search peers">
+                <button class="btn btn-primary px-4" type="submit">
+                    Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Advanced Filters -->
+        <div class="collapse {{ 'show' if filters.user_type or filters.org_id else '' }}" id="advancedSearch">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="GET" id="filterForm" class="needs-validation" novalidate>
+                        <!-- Preserve search query if exists -->
+                        {% if filters.search_query %}
+                        <input type="hidden" name="search_query" value="{{ filters.search_query }}">
+                        {% endif %}
+                        
+                        <div class="row g-4">
+                            <!-- User Type Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">User Type</label>
+                                <div class="d-flex flex-column gap-2">
+                                    {% for type in ['Student', 'Professor', 'Company_recruiter'] %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               name="user_type" 
+                                               value="{{ type }}"
+                                               id="type{{ type }}"
+                                               {% if type in filters.user_type %}checked{% endif %}>
+                                        <label class="form-check-label" for="type{{ type }}">
+                                            {{ type.replace('_', ' ').title() }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Organization Filter -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Organization</label>
+                                <select class="form-select" name="org_id" id="orgSelect">
+                                    <option value="">All Organizations</option>
+                                    {% for org in organizations %}
+                                    <option value="{{ org.org_id }}" 
+                                            data-org-type="{{ org.org_type }}"
+                                            {% if org.org_id|string == filters.org_id %}selected{% endif %}>
+                                        {{ org.org_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Sort Options -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Sort By</label>
+                                <select class="form-select" name="sort_by">
+                                    <option value="username" {% if filters.sort_by == 'username' %}selected{% endif %}>Name</option>
+                                    <option value="user_type" {% if filters.sort_by == 'user_type' %}selected{% endif %}>User Type</option>
+                                    <option value="org_name" {% if filters.sort_by == 'org_name' %}selected{% endif %}>Organization</option>
+                                </select>
+                            </div>
+
+                            <!-- Results Per Page -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Results Per Page</label>
+                                <select class="form-select" name="per_page">
+                                    {% for count in [12, 24, 48] %}
+                                    <option value="{{ count }}" {% if pagination.per_page == count %}selected{% endif %}>
+                                        {{ count }} peers
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Filter Actions -->
+                            <div class="col-12 border-top pt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="submit" class="btn btn-primary d-flex align-items-center gap-2">
+                                        <i class="bi bi-funnel"></i> Apply Filters
+                                    </button>
+                                    <a href="{{ url_for('peers') }}" 
+                                       class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                                        <i class="bi bi-x-circle"></i> Clear All
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Filters & Results Count -->
+    <div class="mb-4">
+        <!-- Active Filters -->
+        {% if filters.search_query or filters.user_type or filters.org_id %}
+        <div class="mb-2">
+            <h6 class="text-muted mb-2">Active Filters:</h6>
+            <div class="d-flex flex-wrap gap-2">
+                {% if filters.search_query %}
+                <span class="badge bg-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-search"></i>
+                    {{ filters.search_query }}
+                </span>
+                {% endif %}
+                
+                {% for type in filters.user_type %}
+                <span class="badge bg-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-person"></i>
+                    {{ type.replace('_', ' ').title() }}
+                </span>
+                {% endfor %}
+
+                {% if filters.org_id %}
+                <span class="badge bg-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-building"></i>
+                    {{ organizations|selectattr('org_id', 'equalto', filters.org_id|int)|map(attribute='org_name')|first }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Results Count -->
+        <p class="text-muted mb-0">
+            Showing {{ peers|length }} of {{ total_results }} peer{{ 's' if total_results != 1 else '' }}
+        </p>
+    </div>
+
+    <!-- Peers Grid -->
+    {% if peers %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+        {% for peer in peers %}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm hover-shadow">
+                <div class="card-body">
+                    <!-- Profile Header -->
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="https://ui-avatars.com/api/?name={{ peer.username }}&background=random" 
+                             class="rounded-circle"
+                             alt="{{ peer.username }}"
+                             width="48"
+                             height="48">
+                        <div>
+                            <h5 class="card-title mb-1">{{ peer.username }}</h5>
+                            <span class="badge bg-primary">
+                                {{ peer.user_type.replace('_', ' ').title() }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Organization -->
+                    {% if peer.org_name %}
+                    <p class="text-muted mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-building"></i>
+                        <span>{{ peer.org_name }}</span>
+                    </p>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('user_profile', username=peer.username) }}" 
+                           class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                            <i class="bi bi-person"></i> View Profile
+                        </a>
+                        <a href="{{ url_for('chat', username=peer.username) }}" 
+                           class="btn btn-outline-primary btn-sm d-flex align-items-center gap-2">
+                            <i class="bi bi-chat"></i> Message
+                        </a>
+                        <button class="btn btn-sm d-flex align-items-center gap-2 {% if peer.is_following %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                                onclick="toggleFollow({{ peer.user_id }})"
+                                data-user-id="{{ peer.user_id }}"
+                                title="{{ 'Unfollow' if peer.is_following else 'Follow' }} {{ peer.username }}">
+                            <i class="bi bi-person-{{ 'check-fill' if peer.is_following else 'plus' }}"></i>
+                            <span>{{ 'Following' if peer.is_following else 'Follow' }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Peer navigation" class="d-flex justify-content-between align-items-center">
+        <p class="text-muted mb-0">
+            Page {{ pagination.page }} of {{ pagination.pages }}
+        </p>
+        <ul class="pagination mb-0">
+            <li class="page-item {{ 'disabled' if pagination.page == 1 }}">
+                <a class="page-link" href="{{ url_for('peers', page=pagination.page-1, **filters) }}" aria-label="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                    <span>Previous</span>
+                </a>
+            </li>
+            {% for p in range(max(1, pagination.page - 2), min(pagination.pages + 1, pagination.page + 3)) %}
+            <li class="page-item {{ 'active' if p == pagination.page }}">
+                <a class="page-link" href="{{ url_for('peers', page=p, **filters) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if pagination.page == pagination.pages }}">
+                <a class="page-link" href="{{ url_for('peers', page=pagination.page+1, **filters) }}" aria-label="Next">
+                    <span>Next</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="bi bi-people display-1 text-muted mb-3"></i>
+        <h3 class="text-muted">No peers found</h3>
+        <p class="text-muted mb-4">Try adjusting your search criteria or filters.</p>
+        <a href="{{ url_for('peers') }}" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat"></i> Clear All Filters
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleFollow(userId) {
+    const button = document.querySelector(`button[data-user-id="${userId}"]`);
+    if (!button) return;
+
+    // Disable button and show loading state
+    button.disabled = true;
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    
+    fetch(`/toggle_follow/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const isFollowing = data.action === 'followed';
+            button.classList.toggle('btn-primary', isFollowing);
+            button.classList.toggle('btn-outline-primary', !isFollowing);
+            button.innerHTML = `
+                <i class="bi bi-person-${isFollowing ? 'check-fill' : 'plus'}"></i>
+                <span>${isFollowing ? 'Following' : 'Follow'}</span>
+            `;
+            
+            showToast('success', data.message);
+        } else {
+            throw new Error(data.message || 'Error updating follow status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalContent;
+        showToast('error', error.message);
+    })
+    .finally(() => {
+        button.disabled = false;
+    });
+}
+
+function showToast(type, message) {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    document.querySelector('.toast-container').appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => toast.remove());
+}
+function filterOrganizations() {
+    const userTypes = Array.from(document.querySelectorAll('input[name="user_type"]:checked'))
+        .map(cb => cb.value);
+    const orgSelect = document.getElementById('orgSelect');
+    const options = Array.from(orgSelect.options);
+    
+    // Reset display of all options
+    options.forEach(option => {
+        option.style.display = '';
+    });
+
+    // Always show "All Organizations" option
+    options[0].style.display = '';
+
+    if (userTypes.length > 0) {
+        // Hide irrelevant organizations based on user type
+        options.forEach(option => {
+            if (option.value === '') return; // Skip "All Organizations" option
+            
+            const isEducational = ['Student', 'Professor'].some(type => userTypes.includes(type));
+            const isCompany = userTypes.includes('Company_recruiter');
+            const orgType = option.getAttribute('data-org-type');
+
+            if ((isEducational && orgType !== 'Educational') || 
+                (isCompany && orgType !== 'Company')) {
+                option.style.display = 'none';
+            }
+        });
+
+        // If currently selected option is hidden, reset to "All Organizations"
+        if (orgSelect.selectedOptions[0].style.display === 'none') {
+            orgSelect.value = '';
+        }
+    }
+}
+
+// Add event listeners to user type checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+    const userTypeCheckboxes = document.querySelectorAll('input[name="user_type"]');
+    userTypeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', filterOrganizations);
+    });
+
+    // Initial filter on page load
+    filterOrganizations();
+
+    // Keep existing event listeners...
+});
+// Initialize Bootstrap components
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Initialize tooltips if needed
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+
+<style>
+.hover-shadow {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.toast-container {
+    z-index: 1050;
+}
+</style>
+{% endblock %}

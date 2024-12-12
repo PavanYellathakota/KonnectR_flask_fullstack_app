@@ -1,0 +1,224 @@
+<!-- templates/saved_posts.html -->
+{% extends "base.html" %}
+{% block title %}Saved Posts{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Saved Posts</h2>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if posts %}
+        <div class="row" id="saved-posts-container">
+            {% for post in posts %}
+            <div class="col-12 mb-4 post-card" data-post-id="{{ post.post_id }}">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title mb-0">{{ post.title }}</h5>
+                            <span class="badge bg-{{ 'success' if post.post_type == 'Project' else 'primary' }}">
+                                {{ post.post_type }}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-3 text-muted small">
+                            <div class="d-flex flex-wrap gap-3">
+                                <span>
+                                    <i class="fas fa-user"></i> 
+                                    {{ post.username }}
+                                    {% if post.org_name %}
+                                        ({{ post.org_name }})
+                                    {% endif %}
+                                </span>
+                                <span>
+                                    <i class="fas fa-tag"></i> 
+                                    {{ post.field_of_interest }}
+                                </span>
+                                <span>
+                                    <i class="fas fa-bookmark"></i> 
+                                    Saved on: {{ post.saved_at.strftime('%Y-%m-%d') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="card-text">
+                            {{ post.description[:200] }}{% if post.description|length > 200 %}...{% endif %}
+                        </p>
+
+                        <div class="d-flex gap-2 flex-wrap">
+
+                            {% if post.source_url %}
+                            <a href="{{ post.source_url }}" 
+                               target="_blank" 
+                               class="btn btn-info btn-sm"
+                               onclick="trackView({{ post.post_id }})">
+                                <i class="bi bi-box-arrow-up-right"></i> View Post
+                            </a>
+                            {% endif %}
+                            
+                            {% if post.post_type == 'Project' %}
+                                <button class="btn btn-outline-success btn-sm" 
+                                        onclick="handleJoin({{ post.post_id }})">
+                                    <i class="fas fa-users"></i> Join Project
+                                </button>
+                            {% else %}
+                                <button class="btn btn-outline-primary btn-sm" 
+                                        onclick="handleApply({{ post.post_id }})">
+                                    <i class="fas fa-paper-plane"></i> Apply
+                                </button>
+                            {% endif %}
+                            
+                            <button class="btn btn-success btn-sm save-btn" 
+                                    onclick="handleSave({{ post.post_id }})">
+                                <i class="fas fa-bookmark"></i> Saved
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-bookmark fa-3x text-muted"></i>
+            </div>
+            <h3 class="text-muted">No Saved Posts</h3>
+            <p class="text-muted">Posts you save will appear here.</p>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">
+                <i class="fas fa-search"></i> Browse Posts
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Function to handle smooth removal of posts
+    function removePostCard(postId) {
+        const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+        if (postCard) {
+            postCard.style.transition = 'all 0.3s ease';
+            postCard.style.opacity = '0';
+            postCard.style.transform = 'translateX(20px)';
+            
+            setTimeout(() => {
+                postCard.remove();
+                
+                // Check if there are any posts left
+                const remainingPosts = document.querySelectorAll('.post-card');
+                if (remainingPosts.length === 0) {
+                    location.reload(); // Reload to show the empty state
+                }
+            }, 300);
+        }
+    }
+
+    // Enhanced save button handler
+    function handleSave(postId) {
+        const button = event.target.closest('.save-btn');
+        button.disabled = true; // Prevent double-clicks
+        
+        fetch(`/toggle_save/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                if (data.action === 'unsaved') {
+                    removePostCard(postId);
+                    
+                    // Show toast notification
+                    const toast = new bootstrap.Toast(document.createElement('div'));
+                    toast.show();
+                }
+            } else {
+                throw new Error(data.message || 'Error saving post');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'An error occurred while saving the post');
+            button.disabled = false;
+        });
+    }
+
+    // Enhanced apply/join handlers with loading states
+    function handleApply(postId) {
+        const button = event.target.closest('button');
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Applying...';
+        
+        fetch(`/apply/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.redirect_url) {
+                window.location.href = data.redirect_url;
+            } else {
+                throw new Error(data.message || 'Error applying to post');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'An error occurred while applying');
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-paper-plane"></i> Apply';
+        });
+    }
+
+    function handleJoin(postId) {
+        const button = event.target.closest('button');
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Joining...';
+        
+        fetch(`/join/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.redirect_url) {
+                window.location.href = data.redirect_url;
+            } else {
+                throw new Error(data.message || 'Error joining project');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'An error occurred while joining');
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-users"></i> Join Project';
+        });
+    }
+</script>
+{% endblock %}

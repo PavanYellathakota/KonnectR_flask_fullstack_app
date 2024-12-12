@@ -1,0 +1,24 @@
+#Config.yaml
+app:
+  user_secret_key: 'USER_SECRET_KEY9999'
+  admin_secret_key: 'ADMIN_SECRET_KEY9999'
+  user_port: 5000  # Port for user portal
+  admin_port: 5001  # Port for admin portal
+db:
+  host: 'www.mysql.org'
+  user: 'username'
+  passwd: 'passwd'
+  db: 'yellatp_KonnectR'
+  port: 3306
+tables:
+  user: 'Users'
+  posts: 'Posts'
+  SavedPosts: 'Saved_Posts'
+  Orgs: 'Organizations'
+  follows: 'Followers'
+  msgs: 'Messages'
+  po_analytics: 'Post_Analytics'
+  po_instrct: 'Post_Interactions'
+  
+
+

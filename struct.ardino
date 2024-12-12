@@ -1,0 +1,44 @@
+KONNECTR
+├── _pycache_                                 
+├── static
+│   ├── CSS
+│       ├── bootstrap.css                       
+│   ├── JS
+│       ├── javascripts.js                      
+├── templates
+│   ├── about.html                              
+│   ├── admin_base.html
+│   ├── admin_dashboard.html
+│   ├── admin_login.html
+│   ├── base.html
+│   ├── chat.html
+│   ├── create_post.html
+│   ├── error.html
+│   ├── footer.html
+│   ├── forgot_password.html
+│   ├── header.html
+│   ├── home.html
+│   ├── index.html
+│   ├── login.html
+│   ├── logout.html
+│   ├── messages.html
+│   ├── opportunities.html
+│   ├── peers.html
+│   ├── posts_manage.html
+│   ├── profile.html
+│   ├── register.html
+│   ├── saved_posts.html
+│   ├── user_manage.html
+│   ├── user_profile.html
+│   ├── password_requests.html 
+│   └── view_post.html
+├── admin_privileges.py
+├── admin.py
+├── app.py
+├── baseObject.py
+├── services.py
+├── user.py
+├── README.md
+├── Config.yaml
+├── requirements.txt
+└── venv

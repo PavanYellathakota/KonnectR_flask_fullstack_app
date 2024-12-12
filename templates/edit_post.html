@@ -1,0 +1,131 @@
+<!-- templates/edit_post.html -->
+{% extends "base.html" %}
+{% block title %}Edit Post{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h3 class="card-title mb-0">Edit Post</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title*</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="title" 
+                                   name="title" 
+                                   value="{{ post.title }}"
+                                   required>
+                            <div class="invalid-feedback">Please provide a title.</div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description*</label>
+                            <textarea class="form-control" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="5" 
+                                      required>{{ post.description }}</textarea>
+                            <div class="invalid-feedback">Please provide a description.</div>
+                        </div>
+
+                        <!-- Field of Interest -->
+                        <div class="mb-3">
+                            <label for="field_of_interest" class="form-label">Field of Interest*</label>
+                            <select class="form-select" id="field_of_interest" name="field_of_interest" required>
+                                <option value="">Select Field</option>
+                                {% for field in ['IT', 'Comp-Sci', 'Electronics', 'AI & ML', 'Data Science'] %}
+                                <option value="{{ field }}" {% if post.field_of_interest == field %}selected{% endif %}>
+                                    {{ field }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Please select a field.</div>
+                        </div>
+
+                        <!-- Source URL (Optional) -->
+                        <div class="mb-3">
+                            <label for="source_url" class="form-label">Source URL (Optional)</label>
+                            <input type="url" 
+                                   class="form-control" 
+                                   id="source_url" 
+                                   name="source_url"
+                                   value="{{ post.source_url }}">
+                            <div class="form-text">Add a link to additional information or resources.</div>
+                        </div>
+
+                        <!-- Post Type (Display only - can't be changed) -->
+                        <div class="mb-3">
+                            <label class="form-label">Post Type</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   value="{{ post.post_type }}"
+                                   disabled>
+                            <div class="form-text">Post type cannot be changed after creation.</div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> Save Changes
+                            </button>
+                            <a href="{{ url_for('my_posts') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+
+function showToast(type, message) {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    document.querySelector('.toast-container').appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => toast.remove());
+}
+</script>
+{% endblock %}

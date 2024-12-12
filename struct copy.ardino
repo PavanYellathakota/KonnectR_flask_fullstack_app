@@ -1,0 +1,35 @@
+KONNECT-R/
+├── app.py                              # Main Flask application file; defines routes and initializes the app
+├── baseObject.py                       # Base class for handling database operations (CRUD functionality)
+├── user.py                             # Module for managing user-specific operations (e.g., authentication, profile management)
+├── services.py                         # Contains business logic for routes; separates logic from route definitions
+├── Config.yaml                         # Configuration file storing app secrets, database credentials, and other settings
+├── templates/                          # Folder containing HTML templates for rendering dynamic web pages
+│   ├── base.html                       # Admin dashboard base template  
+│   ├── dashboard.html                  # Admin homepage with overview
+│   ├── users.html                      # User management page
+│   ├── posts.html                      # Post management page 
+│   ├── reports.html                    # User activity reports       
+│   ├── login.html                      # Admin login page            
+│   ├── base.html                       # Base template with common layout (e.g., navigation bar, footer)
+│   ├── index.html                      # Landing page for introducing Konnect-R platform features and roles
+│   ├── register.html                   # User registration form with role-specific selections
+│   ├── login.html                      # Login form for authentication
+│   ├── home.html                       # User's personalized homepage displaying posts and options
+│   ├── messages.html                   # Interface for managing communication messages
+│   ├── chat.html                       # Chatbox template for real-time conversations
+│   ├── create_post.html                # Page for creating new posts or research opportunities
+│   ├── view_post.html                  # Page for viewing detailed post information and applying/enquiring
+│   ├── saved_post.html                 # Displays posts saved by the user for future reference
+│   ├── profile.html                    # User profile page showcasing personal details and activities
+│   ├── peers.html                      # Displays connections or collaborators in the user's network
+│   ├── forgot_password.html            # Page for initiating password reset process
+│   ├── logout.html                     # Redirects user upon successful logout
+├── static/                             # Folder for static files like CSS, JavaScript, and images
+│   ├── CSS/                            # Contains stylesheets for consistent UI
+│   │   ├── bootstrap.min.css           # Bootstrap CSS framework for responsive design
+│   ├── JS/                             # JavaScript files for interactivity and frontend logic
+│       ├── bootstrap.bundle.min.js     # Bootstrap JavaScript bundle with necessary dependencies
+├── venv/                               # Virtual environment folder for isolating project dependencies (optional)
+├── requirements.txt                    # List of Python dependencies required for the project
+└── README.md                           # Project documentation; provides an overview, setup instructions, and usage guidelines

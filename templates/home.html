@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-primary text-white rounded-4 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h2 class="mb-3">Welcome to KonnectR</h2>
+                            <p class="mb-4 lead">Connect with students, professors, and professionals. 
+                                Discover opportunities and share your expertise.</p>
+                            <div class="d-flex gap-3">
+                                <a href="{{ url_for('opportunities') }}" class="btn btn-light">
+                                    <i class="bi bi-search"></i> Browse 
+                                </a>
+                                <a href="{{ url_for('create_post') }}" class="btn btn-outline-light">
+                                    <i class="bi bi-plus-lg"></i> Create 
+                                </a>
+                                <a href="{{ url_for('peers') }}" class="btn btn-outline-light">
+                                    <i class="bi bi-person"></i> Network
+                                </a>                                
+                            </div>
+                            
+                        </div>
+                        <div class="col-lg-4 d-none d-lg-block text-center">
+                            <img src="{{ url_for('static', filename='images/KonnectR_logo.svg') }}" 
+                                 alt="Connect" 
+                                 class="img-fluid"
+                                 style="max-height: 200px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Posts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1">Ready to uncover what’s brewing for you? 🐣</h4>
+                    <p class="text-muted mb-0">Let’s sneak a peek at some jaw-dropping works 🫣</p>
+                </div>
+                <a href="{{ url_for('opportunities') }}" class="btn btn-outline-primary">
+                    View All <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Posts Grid -->
+    {% if posts %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        {% for post in posts[:6] %}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm hover-lift">
+                <div class="card-body">
+                    <!-- Post Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title text-truncate mb-0">{{ post.title }}</h5>
+                        <span class="badge bg-{{ 'success' if post.post_type == 'Project' else 'primary' }}">
+                            {{ post.post_type }}
+                        </span>
+                    </div>
+
+                    <!-- Post Meta -->
+                    <div class="d-flex align-items-center text-muted mb-3 small">
+                        <div class="d-flex align-items-center me-3">
+                            <i class="bi bi-person me-1"></i>
+                            <span>{{ post.username }}</span>
+                        </div>
+                        {% if post.org_name %}
+                        <div class="d-flex align-items-center me-3">
+                            <i class="bi bi-building me-1"></i>
+                            <span>{{ post.org_name }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-1"></i>
+                            <span>{{ moment(post.post_created_at).fromNow() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Post Description -->
+                    <p class="card-text text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ post.description }}
+                    </p>
+
+                    <!-- Post Analytics -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                        <span><i class="bi bi-eye me-1"></i> {{ post.analytics.views or 0 }} views</span>
+                        <span><i class="bi bi-bookmark me-1"></i> {{ post.analytics.saves or 0 }} saves</span>
+                        <span><i class="bi bi-send me-1"></i> {{ post.analytics.applies or 0 }} applies</span>
+                    </div>
+
+                    <!-- Post Actions -->
+                    <div class="d-flex gap-2">
+                        {% if post.post_type == 'Project' %}
+                            <button class="btn btn-success btn-sm flex-grow-1" 
+                                    onclick="handleJoin({{ post.post_id }})"
+                                    data-post-id="{{ post.post_id }}">
+                                <i class="bi bi-people me-1"></i> Join Project
+                            </button>
+                        {% else %}
+                            <button class="btn btn-primary btn-sm flex-grow-1" 
+                                    onclick="handleApply({{ post.post_id }})"
+                                    data-post-id="{{ post.post_id }}">
+                                <i class="bi bi-send me-1"></i> Apply Now
+                            </button>
+                        {% endif %}
+
+                        <button class="btn {% if post.is_saved %}btn-success{% else %}btn-outline-success{% endif %} btn-sm"
+                                onclick="handleSave({{ post.post_id }})"
+                                data-post-id="{{ post.post_id }}">
+                            <i class="bi bi-bookmark{% if post.is_saved %}-fill{% endif %}"></i>
+                        </button>
+
+                        <a href="{{ url_for('view_post', post_id=post.post_id) }}" 
+                           class="btn btn-outline-primary btn-sm"
+                           onclick="trackInteraction({{ post.post_id }}, 'view')">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <div class="display-1 text-muted mb-4">
+            <i class="bi bi-post"></i>
+        </div>
+        <h3>Stuck in a pickle 🥒? Share, Connect, and Solve it like a pro 😎</h3>
+        <p class="text-muted mb-4">Post an opportunity and let the world snack on your challenges 🤪!</p>
+        <a href="{{ url_for('create_post') }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-lg me-2"></i>Create New Post
+        </a>
+    </div>    
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Track interactions
+function trackInteraction(postId, type) {
+    fetch(`/track/${postId}/${type}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    }).catch(console.error);
+}
+
+// Handle join/apply
+function handleInteraction(postId, endpoint, buttonText) {
+    const button = document.querySelector(`button[data-post-id="${postId}"]`);
+    if (!button) return;
+
+    button.disabled = true;
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+    fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            } else {
+                button.innerHTML = buttonText;
+                button.classList.remove('btn-primary', 'btn-success');
+                button.classList.add('btn-secondary');
+                button.disabled = true;
+                showToast(data.message);
+            }
+        } else {
+            throw new Error(data.message || 'Error processing request');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalContent;
+        button.disabled = false;
+        showToast(error.message, 'danger');
+    });
+}
+
+function handleApply(postId) {
+    handleInteraction(postId, `/apply/${postId}`, '<i class="bi bi-check"></i> Applied');
+}
+
+function handleJoin(postId) {
+    handleInteraction(postId, `/join/${postId}`, '<i class="bi bi-check"></i> Joined');
+}
+
+function handleSave(postId) {
+    const button = document.querySelector(`button[data-post-id="${postId}"]`);
+    if (!button) return;
+
+    button.disabled = true;
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+    fetch(`/toggle_save/${postId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const isSaved = data.action === 'saved';
+            button.classList.toggle('btn-success', isSaved);
+            button.classList.toggle('btn-outline-success', !isSaved);
+            button.innerHTML = `<i class="bi bi-bookmark${isSaved ? '-fill' : ''}"></i>`;
+            showToast(data.message);
+        } else {
+            throw new Error(data.message || 'Error saving post');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalContent;
+        showToast(error.message, 'danger');
+    })
+    .finally(() => {
+        button.disabled = false;
+    });
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    document.querySelector('.toast-container').appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => toast.remove());
+}
+</script>
+
+<style>
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 2rem rgba(0,0,0,.15)!important;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+</style>
+{% endblock %}

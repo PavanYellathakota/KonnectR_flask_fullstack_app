@@ -1,0 +1,25 @@
+<svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clean, professional typography -->
+  <text x="50" y="80" 
+        font-family="Arial, sans-serif" 
+        font-size="48" 
+        font-weight="bold" 
+        fill="#1e40af">Konnect</text>
+        
+  <text x="240" y="80" 
+        font-family="Arial, sans-serif" 
+        font-size="48" 
+        font-weight="bold" 
+        fill="#3b82f6">R</text>
+
+  <!-- Minimal connection symbol representing the three stakeholders -->
+  <circle cx="290" cy="60" r="3" fill="#3b82f6"/>
+  <circle cx="310" cy="40" r="3" fill="#3b82f6"/>
+  <circle cx="310" cy="80" r="3" fill="#3b82f6"/>
+  
+  <!-- Connection lines -->
+  <path d="M290 60 L310 40 M290 60 L310 80" 
+        stroke="#3b82f6" 
+        stroke-width="2" 
+        fill="none"/>
+</svg>

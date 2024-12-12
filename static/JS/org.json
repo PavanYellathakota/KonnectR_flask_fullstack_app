@@ -1,0 +1,118 @@
+{
+    "organizations": [
+        {
+            "org_id": 1,
+            "org_name": "KonnectR",
+            "org_logo": "KonnectR_logo.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 2,
+            "org_name": "Harvard University",
+            "org_logo": "https://example.com/logos/harvard.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 3,
+            "org_name": "Massachusetts Institute of Technology",
+            "org_logo": "https://example.com/logos/mit.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 4,
+            "org_name": "Stanford University",
+            "org_logo": "https://example.com/logos/stanford.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 5,
+            "org_name": "University of Oxford",
+            "org_logo": "https://example.com/logos/oxford.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 6,
+            "org_name": "University of Cambridge",
+            "org_logo": "https://example.com/logos/cambridge.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 7,
+            "org_name": "University of Tokyo",
+            "org_logo": "https://example.com/logos/tokyo-uni.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 8,
+            "org_name": "ETH Zurich",
+            "org_logo": "https://example.com/logos/eth.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 9,
+            "org_name": "National University of Singapore",
+            "org_logo": "https://example.com/logos/nus.png",
+            "org_type": "Educational"
+        },
+        {
+            "org_id": 10,
+            "org_name": "Microsoft Corporation",
+            "org_logo": "https://example.com/logos/microsoft.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 11,
+            "org_name": "Apple Inc.",
+            "org_logo": "https://example.com/logos/apple.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 12,
+            "org_name": "Google LLC",
+            "org_logo": "https://example.com/logos/google.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 13,
+            "org_name": "Amazon.com Inc.",
+            "org_logo": "https://example.com/logos/amazon.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 14,
+            "org_name": "Meta Platforms Inc.",
+            "org_logo": "https://imgs.search.brave.com/O0Ov_qFg-Ie-x5PiN4MG...",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 15,
+            "org_name": "Tesla Inc.",
+            "org_logo": "https://example.com/logos/tesla.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 16,
+            "org_name": "IBM Corporation",
+            "org_logo": "https://upload.wikimedia.org/wikipedia/commons/5/5...",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 17,
+            "org_name": "Samsung Electronics",
+            "org_logo": "https://example.com/logos/samsung.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 18,
+            "org_name": "Intel Corporation",
+            "org_logo": "https://example.com/logos/intel.png",
+            "org_type": "Company"
+        },
+        {
+            "org_id": 19,
+            "org_name": "NVIDIA Corporation",
+            "org_logo": "https://s3.amazonaws.com/cms.ipressroom.com/219/fi...",
+            "org_type": "Company"
+        }
+    ]
+}

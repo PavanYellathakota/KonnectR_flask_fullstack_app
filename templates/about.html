@@ -1,0 +1,167 @@
+<!-- templates/about.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - KonnectR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('{{ url_for('static', filename='images/about-bg.jpg') }}') no-repeat center center;
+            background-size: cover;
+            padding: 150px 0;
+            color: white;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .header p {
+            font-size: 1.5rem;
+        }
+
+        /* Mission Section */
+        .mission {
+            padding: 80px 0;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .mission h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .mission p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Team Section */
+        .team {
+            padding: 80px 0;
+        }
+        .team h2 {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .team .member {
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .team .member:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .team .member img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .team .member h5 {
+            font-size: 1.25rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .team .member p {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .team .social-icons a {
+            margin: 0 5px;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+        .team .social-icons a:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <!-- Header Section -->
+    <div class="header">
+        <div class="container">
+            <h1>About KonnectR</h1>
+            <p>A platform to connect, collaborate, and create opportunities.</p>
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <section class="mission">
+        <div class="container">
+            <h2>Our Mission</h2>
+            <p>
+                At KonnectR, we strive to bridge gaps between talent, opportunity, and innovation. 
+                Our goal is to empower individuals with the tools and connections they need to excel in their journeys.
+            </p>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team">
+        <div class="container">
+            <h2>Meet Our Team</h2>
+            <div class="row g-4">
+                <!-- Team Member 1 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="member">
+                        <img src="{{ url_for('static', filename='images/team/Elon.png') }}" alt="Elon Musk">
+                        <h5>Elon Musk</h5>
+                        <p>CEO & Founder</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="bi bi-twitter"></i></a>
+                            <a href="#"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Team Member 2 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="member">
+                        <img src="{{ url_for('static', filename='images/team/Ben.png') }}" alt="Pavan Yellathakota">
+                        <h5>Pavan Yellathakota</h5>
+                        <p>Chief Technology Officer</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="bi bi-github"></i></a>
+                            <a href="#"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Team Member 3 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="member">
+                        <img src="{{ url_for('static', filename='images/team/Jensen.png') }}" alt="Jensen Huang">
+                        <h5>Jensen Huang</h5>
+                        <p>Head of Marketing</p>
+                        <div class="social-icons">
+                            <a href="#"><i class="bi bi-facebook"></i></a>
+                            <a href="#"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

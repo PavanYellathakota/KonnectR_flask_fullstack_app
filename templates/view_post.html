@@ -1,0 +1,21 @@
+<!-- KonnectR/templates/view_post.html -->
+{% extends "base.html" %}
+
+{% block title %}View Post{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h4 class="mb-4">Post Content</h4>
+            
+            <!-- Iframe to render content from the source URL -->
+            <div id="iframe-container">
+                <iframe src="{{ post.source_url }}" 
+                        style="width: 100%; height: 600px; border: none;">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

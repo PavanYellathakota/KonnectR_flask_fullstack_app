@@ -1,0 +1,404 @@
+{% extends "admin_base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<style>
+.period-selector {
+    margin-bottom: 15px;
+}
+.period-selector button {
+    margin-right: 5px;
+}
+.period-selector button.active {
+    background-color: #007bff;
+    color: white;
+}
+.stat-card {
+    transition: transform 0.2s ease;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+.chart-container {
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Admin Dashboard</h2>
+    
+    <!-- Statistics Overview -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card border-primary mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Total Users</h5>
+                    <h3 class="mb-0">{{ stats.total_users or 0 }}</h3>
+                    <small class="text-muted">Registered users</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-success mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-success">New Users (7 days)</h5>
+                    <h3 class="mb-0">{{ stats.new_users or 0 }}</h3>
+                    <small class="text-muted">Recent registrations</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-info mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Active Users (24h)</h5>
+                    <h3 class="mb-0">{{ stats.active_users or 0 }}</h3>
+                    <small class="text-muted">Recently active</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card border-warning mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Total Posts</h5>
+                    <h3 class="mb-0">{{ stats.total_posts or 0 }}</h3>
+                    <small class="text-muted">Published posts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Growth Charts -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">User Growth Trend</h5>
+                    <div id="userGrowthChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Post Growth Trend</h5>
+                    <div id="postGrowthChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Analysis -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">User Type Analysis</h5>
+                    <div id="userTypeChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">User Activity Tracking</h5>
+                    <div class="period-selector">
+                        <button class="btn btn-outline-primary active" data-period="daily">Daily</button>
+                        <button class="btn btn-outline-primary" data-period="weekly">Weekly</button>
+                        <button class="btn btn-outline-primary" data-period="monthly">Monthly</button>
+                        <button class="btn btn-outline-primary" data-period="yearly">Yearly</button>
+                    </div>
+                    <div id="userActivityChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Tables -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Users</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Type</th>
+                                    <!--th>Created At</th-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in recent_users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ user.user_type }}</span>
+                                    </td>
+                                    <!--td>{{ moment(user.created_at).fromNow() }}</td-->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Posts</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <!--th>Created At</th-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for post in recent_posts %}
+                                <tr>
+                                    <td>{{ post.title }}</td>
+                                    <td>{{ post.username }}</td>
+                                    <!--td>{{ moment(post.post_created_at).fromNow() }}</td-->
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch analytics data
+    Promise.all([
+        fetch('/api/analytics/growth-stats').then(r => r.json()),
+        fetch('/api/analytics/user-stats').then(r => r.json()),
+        fetch('/api/analytics/user-activity?period=daily').then(r => r.json())
+    ]).then(([growthStats, userStats, activityStats]) => {
+        if (growthStats.success) {
+            renderGrowthCharts(growthStats);
+        }
+        if (userStats.success) {
+            renderUserTypeAnalysis(userStats.user_stats);
+        }
+        if (activityStats.success) {
+            renderUserActivity(activityStats.activity);
+        }
+    }).catch(error => console.error('Error fetching analytics:', error));
+});
+
+// Growth Charts
+function renderGrowthCharts(data) {
+    // User Growth Chart
+    const userTrace = {
+        x: data.user_growth.map(d => d.month),
+        y: data.user_growth.map(d => d.new_users),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'New Users',
+        line: { color: 'rgb(75, 192, 192)', shape: 'spline' },
+        marker: { size: 6 }
+    };
+
+    const userLayout = {
+        height: 300,
+        margin: { t: 20, r: 20, b: 40, l: 40 },
+        xaxis: { 
+            title: 'Month',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        yaxis: { 
+            title: 'Number of Users',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)'
+    };
+
+    Plotly.newPlot('userGrowthChart', [userTrace], userLayout);
+
+    // Post Growth Chart
+    const postTrace = {
+        x: data.post_growth.map(d => d.month),
+        y: data.post_growth.map(d => d.new_posts),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'New Posts',
+        line: { color: 'rgb(54, 162, 235)', shape: 'spline' },
+        marker: { size: 6 }
+    };
+
+    const postLayout = {
+        height: 300,
+        margin: { t: 20, r: 20, b: 40, l: 40 },
+        xaxis: { 
+            title: 'Month',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        yaxis: { 
+            title: 'Number of Posts',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)'
+    };
+
+    Plotly.newPlot('postGrowthChart', [postTrace], postLayout);
+}
+
+// User Type Analysis
+function renderUserTypeAnalysis(data) {
+    const colors = ['rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(255, 159, 64)', 'rgb(153, 102, 255)'];
+    
+    const traces = [
+        {
+            name: 'Total Users',
+            type: 'bar',
+            x: data.map(d => d.user_type),
+            y: data.map(d => d.total_users),
+            marker: { color: colors[0] },
+            width: 0.2
+        },
+        {
+            name: 'Active Users (30 days)',
+            type: 'bar',
+            x: data.map(d => d.user_type),
+            y: data.map(d => d.active_users),
+            marker: { color: colors[1] },
+            width: 0.2
+        },
+        {
+            name: 'New Users (30 days)',
+            type: 'bar',
+            x: data.map(d => d.user_type),
+            y: data.map(d => d.new_users),
+            marker: { color: colors[2] },
+            width: 0.2
+        },
+        {
+            name: 'Avg Logins',
+            type: 'bar',
+            x: data.map(d => d.user_type),
+            y: data.map(d => d.avg_logins),
+            marker: { color: colors[3] },
+            width: 0.2
+        }
+    ];
+
+    const layout = {
+        height: 400,
+        barmode: 'group',
+        bargap: 0.15,
+        bargroupgap: 0.1,
+        margin: { t: 20, r: 20, b: 60, l: 40 },
+        xaxis: { 
+            title: 'User Type',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        yaxis: { 
+            title: 'Count',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        legend: { 
+            orientation: 'h',
+            y: -0.2
+        },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)'
+    };
+
+    Plotly.newPlot('userTypeChart', traces, layout);
+}
+
+// User Activity
+function renderUserActivity(data) {
+    const trace1 = {
+        x: data.map(d => d.period),
+        y: data.map(d => d.active_users),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'Active Users',
+        line: { color: 'rgb(75, 192, 192)', shape: 'spline' },
+        marker: { size: 6 }
+    };
+
+    const trace2 = {
+        x: data.map(d => d.period),
+        y: data.map(d => d.avg_session_duration),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'Avg Session Duration (min)',
+        yaxis: 'y2',
+        line: { color: 'rgb(255, 159, 64)', shape: 'spline' },
+        marker: { size: 6 }
+    };
+
+    const layout = {
+        height: 400,
+        margin: { t: 20, r: 50, b: 40, l: 40 },
+        xaxis: { 
+            title: 'Period',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        yaxis: { 
+            title: 'Active Users',
+            showgrid: true,
+            gridcolor: 'rgba(0,0,0,0.1)'
+        },
+        yaxis2: {
+            title: 'Avg Session Duration (min)',
+            overlaying: 'y',
+            side: 'right',
+            showgrid: false
+        },
+        legend: {
+            orientation: 'h',
+            y: -0.2
+        },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)'
+    };
+
+    Plotly.newPlot('userActivityChart', [trace1, trace2], layout);
+}
+
+// Period selector handler
+document.querySelectorAll('.period-selector button').forEach(button => {
+    button.addEventListener('click', function() {
+        document.querySelectorAll('.period-selector button').forEach(b => 
+            b.classList.remove('active'));
+        this.classList.add('active');
+        fetch(`/api/analytics/user-activity?period=${this.dataset.period}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    renderUserActivity(data.activity);
+                }
+            });
+    });
+});
+</script>
+{% endblock %}

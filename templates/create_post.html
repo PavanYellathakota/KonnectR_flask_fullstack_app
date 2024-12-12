@@ -1,0 +1,196 @@
+<!-- templates/create_post.html -->
+{% extends "base.html" %}
+{% block title %}Create New Post{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Post
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('create_post') }}" id="createPostForm">
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="title" 
+                                   name="title" 
+                                   value="{{ form_data.title if form_data else '' }}"
+                                   required 
+                                   minlength="5"
+                                   maxlength="200">
+                            <div class="form-text">A clear, concise title for your post (5-200 characters)</div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="4" 
+                                      required 
+                                      minlength="20"
+                                      maxlength="2000">{{ form_data.description if form_data else '' }}</textarea>
+                            <div class="form-text">Detailed description of your post (20-2000 characters)</div>
+                        </div>
+
+                        <!-- Source URL Field -->
+                        <div class="mb-3">
+                            <label for="source_url" class="form-label">Source URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                <input type="url" 
+                                       class="form-control" 
+                                       id="source_url" 
+                                       name="source_url" 
+                                       value="{{ form_data.source_url if form_data else '' }}"
+                                       placeholder="https://example.com/project-details"
+                                       pattern="https?://.+"
+                                       title="Include http:// or https://">
+                            </div>
+                            <div class="form-text">Add a URL that provides more details about your post (optional)</div>
+                        </div>
+
+                        <!-- Post Type Field -->
+                        <div class="mb-3">
+                            <label for="post_type" class="form-label">Post Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="post_type" name="post_type" required>
+                                <option value="" disabled {% if not form_data %}selected{% endif %}>Select post type</option>
+                                {% set post_types = ['Research', 'Project', 'Internship', 'Full-time'] %}
+                                {% for type in post_types %}
+                                    <option value="{{ type }}" {% if form_data and form_data.post_type == type %}selected{% endif %}>
+                                        {{ type }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Choose the type of opportunity you're posting</div>
+                        </div>
+
+                        <!-- Field of Interest -->
+                        <div class="mb-3">
+                            <label for="field_of_interest" class="form-label">Field of Interest <span class="text-danger">*</span></label>
+                            <select class="form-select" id="field_of_interest" name="field_of_interest" required>
+                                <option value="" disabled {% if not form_data %}selected{% endif %}>Select field of interest</option>
+                                {% set fields = [
+                                    'IT', 'Computer Science', 'Electronics', 'AI & ML', 'Data Science',
+                                    'Networking', 'Cyber Security', 'Virtual or Augmented Reality',
+                                    'Robotics', 'Blockchain', 'Cloud Computing', 'Other'
+                                ] %}
+                                {% for field in fields %}
+                                    <option value="{{ field }}" {% if form_data and form_data.field_of_interest == field %}selected{% endif %}>
+                                        {{ field }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Select the primary field related to your post</div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-plus-circle me-2"></i>Create Post
+                            </button>
+                            <a href="{{ url_for('home') }}" class="btn btn-secondary px-4 ms-2">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('createPostForm');
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const postType = document.getElementById('post_type').value;
+        const fieldOfInterest = document.getElementById('field_of_interest').value;
+
+        // Validate title
+        if (title.length < 5 || title.length > 200) {
+            isValid = false;
+            alert('Title must be between 5 and 200 characters');
+        }
+
+        // Validate description
+        if (description.length < 20 || description.length > 2000) {
+            isValid = false;
+            alert('Description must be between 20 and 2000 characters');
+        }
+
+        // Validate post type and field of interest
+        if (!postType || !fieldOfInterest) {
+            isValid = false;
+            alert('Please select both post type and field of interest');
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    // URL field handler
+    const sourceUrlInput = document.getElementById('source_url');
+    sourceUrlInput.addEventListener('input', function(e) {
+        let url = e.target.value.trim();
+        if (url && !url.match(/^https?:\/\//)) {
+            e.target.value = 'https://' + url;
+        }
+    });
+
+    // Character count display
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+
+    function updateCharCount(input, min, max) {
+        const count = input.value.length;
+        input.nextElementSibling.textContent = 
+            `${count} characters (minimum ${min}, maximum ${max})`;
+        
+        if (count < min || count > max) {
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    }
+
+    titleInput.addEventListener('input', () => updateCharCount(titleInput, 5, 200));
+    descriptionInput.addEventListener('input', () => updateCharCount(descriptionInput, 20, 2000));
+});
+</script>
+
+<style>
+.form-select {
+    background-color: #fff;
+}
+.card {
+    border: none;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.is-invalid {
+    border-color: #dc3545;
+}
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

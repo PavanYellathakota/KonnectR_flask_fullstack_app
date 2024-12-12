@@ -1,0 +1,234 @@
+<!-- KonnectR/templates/chat.html-->
+{% extends "base.html" %}
+{% block title %}Chat with {{ chat_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Chat Header -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h5 class="mb-0">{{ chat_user.username }}</h5>
+                            {% if chat_user.org_name %}
+                            <small>{{ chat_user.org_name }}</small>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('messages') }}" class="btn btn-light btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Messages
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div class="card mb-4">
+                <div class="card-body" id="messagesContainer" style="height: 400px; overflow-y: auto;">
+                    {% for message in messages %}
+                    <div class="message mb-3 {% if message.sender_id == session.user_id %}text-end{% endif %}">
+                        <div class="d-inline-block">
+                            <div class="message-bubble p-2 rounded 
+                                        {% if message.sender_id == session.user_id %}
+                                        bg-primary text-white
+                                        {% else %}
+                                        bg-light
+                                        {% endif %}">
+                                {{ message.message_text }}
+                            </div>
+                            <small class="text-muted">
+                                {{ moment(message.sent_at).fromNow() }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="card">
+                <div class="card-body">
+                    <form id="messageForm" onsubmit="event.preventDefault(); sendMessage();">
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="messageInput" 
+                                   class="form-control" 
+                                   placeholder="Type your message..."
+                                   required
+                                   autocomplete="off">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let lastMessageTime = '{{ messages[-1].sent_at if messages else "" }}';
+
+function sendMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    if (!message) return;
+    const button = messageInput.nextElementSibling;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    
+    fetch('/send_message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            receiver_username: '{{ chat_user.username }}',
+            message: message
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Add message to chat
+            addMessageToChat(message);
+            // Clear input
+            messageInput.value = '';
+            // Focus input for next message
+            messageInput.focus();
+        } else {
+            throw new Error(data.message || 'Error sending message');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', error.message || 'Error sending message');
+    })
+    .finally(() => {
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-send"></i> Send';
+    });
+}
+
+function addMessageToChat(message) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message mb-3 text-end';
+    const now = new Date();
+    messageDiv.innerHTML = `
+        <div class="d-inline-block">
+            <div class="message-bubble p-2 rounded bg-primary text-white">
+                ${escapeHtml(message)}
+            </div>
+            <small class="text-muted">
+                just now
+            </small>
+        </div>
+    `;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function showToast(type, message) {
+    const toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        const container = document.createElement('div');
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    toast.addEventListener('hidden.bs.toast', () => toast.remove());
+}
+
+// Auto-scroll to bottom on load
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('messagesContainer');
+    container.scrollTop = container.scrollHeight;
+    // Focus message input
+    document.getElementById('messageInput').focus();
+});
+
+// Optional: Add real-time updates
+setInterval(checkNewMessages, 5000);
+
+function checkNewMessages() {
+    fetch(`/check_messages/{{ chat_user.username }}?since=${encodeURIComponent(lastMessageTime)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.messages.length > 0) {
+                data.messages.forEach(message => {
+                    if (message.sender_id !== {{ session.user_id }}) {
+                        addReceivedMessage(message);
+                    }
+                });
+                lastMessageTime = data.messages[data.messages.length - 1].sent_at;
+            }
+        })
+        .catch(console.error);
+}
+
+function addReceivedMessage(message) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message mb-3';
+    messageDiv.innerHTML = `
+        <div class="d-inline-block">
+            <div class="message-bubble p-2 rounded bg-light">
+                ${escapeHtml(message.message_text)}
+            </div>
+            <small class="text-muted">
+                just now
+            </small>
+        </div>
+    `;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+</script>
+
+<style>
+.message-bubble {
+    max-width: 70%;
+    display: inline-block;
+    word-break: break-word;
+}
+.toast-container {
+    z-index: 1050;
+}
+</style>
+{% endblock %}
