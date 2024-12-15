@@ -1,7 +1,7 @@
 # KonnectR - Job Board and Networking Platform for R&D Enthusiasts
 
 
-![KonnectR Logo](/img/KonnectR_logo.svg)
+![KonnectR Logo](/IMG/KonnectR_logo.svg)
 
 ## Team Members
 - Design & Developed by - PAVAN YELLATHAKOTA.
@@ -46,7 +46,7 @@ The application serves as a centralized hub where:
 ## Database Design
 
 ### Relational Diagram
-![Database Schema](/img/db_schema.png)
+![Database Schema](/IMG/db_schema.png)
 
 ### Key Tables
 - Users
@@ -109,18 +109,18 @@ Users can effortlessly manage their posts on the platform. They have the ability
 
 This feature ensures that the platform remains dynamic and accurate.
 
-![Creating new Posts](/img/create_post.png)
+![Creating new Posts](/IMG/create_post.png)
 
-![Managing Posts](/img/manage_posts.png)
+![Managing Posts](/IMG/manage_posts.png)
 
 ### 2. User Interactions
 Users can interact with each other seamlessly through:
 - **Asynchronous Chat:** Enabling users to connect and communicate throughout their sessions.
 - **Search and Network Building:** Users can search for others on the platform and build their network by following peers, recruiters, and professors, fostering a collaborative environment.
 
-![Messaging](/img/Chat1.png)
+![Messaging](/IMG/Chat1.png)
 
-![Connections](/img/peers.png)
+![Connections](/IMG/peers.png)
 
 ---
 
@@ -133,9 +133,9 @@ Admins have access to a dedicated dashboard offering a comprehensive overview of
 - **User Inflow Monitoring:** Tracks the number of new users joining daily, weekly, monthly, or yearly.
 - **Post Analysis:** Displays the frequency of posts created over specific time periods.
 
-![Application Statistics](/img/App_stats.png)
+![Application Statistics](/IMG/App_stats.png)
 
-![Recent Activities on Application](/img/Recent_activity.png)
+![Recent Activities on Application](/IMG/Recent_activity.png)
 
 #### Example Queries:
 
@@ -189,9 +189,9 @@ Admins can analyze platform usage and user behavior through:
 - **Active User Monitoring:** Review login and logout records to identify active users.
 - **User Interest and Engagement:** Gain insights into the user types (students, professors, recruiters) who are most likely to join and actively engage with the platform.
 
-![User Statistics](/img/User_stats.png)
+![User Statistics](/IMG/User_stats.png)
 
-![Active Users](/img/Active_users_stats.png)
+![Active Users](/IMG/Active_users_stats.png)
 
 #### Example Queries:
 
