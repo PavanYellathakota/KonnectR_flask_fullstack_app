@@ -295,9 +295,6 @@ For the complete Flask project structure, refer to `KONNECTR.aurdino`
 ## License
 This project is licensed under the MIT License.
 
-## Contributing
-Please read CONTRIBUTING.md for contribution guidelines.
-
 ## Acknowledgments
 - Bootstrap for UI components
 - Plotly.js for analytics visualization
