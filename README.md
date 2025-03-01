@@ -111,7 +111,7 @@ This feature ensures that the platform remains dynamic and accurate.
 
 ![Creating new Posts](/IMG/create_post.png)
 
-![Managing Posts](/IMG/manage_posts.png)
+![Managing Posts](/IMG/Manage_posts.png)
 
 ### 2. User Interactions
 Users can interact with each other seamlessly through:
