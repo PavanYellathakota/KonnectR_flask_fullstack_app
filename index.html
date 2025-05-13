@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KonnectR - Job Board and Networking Platform for R&D Enthusiasts">
+    <title>KonnectR - Job Board and Networking Platform for R&D Enthusiasts</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .content-section {
+            margin-bottom: 50px;
+        }
+        .content-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="text-center">
+            <img src="/IMG/KonnectR_logo.svg" alt="KonnectR Logo" class="img-fluid">
+            <h1>KonnectR - Job Board and Networking Platform for R&D Enthusiasts</h1>
+            <p>Design & Developed by - PAVAN YELLATHAKOTA</p>
+        </header>
+
+        <section class="content-section">
+            <h2>Project Narrative</h2>
+            <p>KonnectR is an innovative networking platform designed to bridge the gap between academia and industry. The platform facilitates meaningful connections between students, professors, and industry professionals, enabling collaboration on research projects, job opportunities, and knowledge sharing.</p>
+            <p>The application serves as a centralized hub where:</p>
+            <ul>
+                <li>Students can discover research opportunities and industry positions</li>
+                <li>Professors can share research projects and find collaborators</li>
+                <li>Industry professionals can post job opportunities and connect with talent</li>
+                <li>Administrators can manage the platform and ensure quality interactions</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Primary Use Cases & User Roles</h2>
+            <h3>User Roles Overview</h3>
+            <ul>
+                <li><strong>Students:</strong>
+                    <ul>
+                        <li>Search for research projects and job opportunities</li>
+                        <li>Connect with professors and industry professionals</li>
+                        <li>Apply for positions and save interesting posts</li>
+                        <li>Participate in academic discussions</li>
+                    </ul>
+                </li>
+                <li><strong>Professors:</strong>
+                    <ul>
+                        <li>Post research opportunities</li>
+                        <li>Connect with students and other professors</li>
+                        <li>Share academic resources</li>
+                        <li>Collaborate on research projects</li>
+                    </ul>
+                </li>
+                <li><strong>Company Recruiters:</strong>
+                    <ul>
+                        <li>Post job opportunities</li>
+                        <li>Search for potential candidates</li>
+                        <li>Connect with academic talent</li>
+                        <li>View candidate profiles</li>
+                    </ul>
+                </li>
+                <li><strong>Admin:</strong>
+                    <ul>
+                        <li>Monitor platform activity</li>
+                        <li>Manage user accounts</li>
+                        <li>Handle password reset requests</li>
+                        <li>View analytics and generate reports</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Database Design</h2>
+            <h3>Relational Diagram</h3>
+            <img src="/IMG/db_schema.png" alt="Database Schema" class="img-fluid">
+            <h3>Key Tables</h3>
+            <ul>
+                <li>Users</li>
+                <li>Posts</li>
+                <li>Messages</li>
+                <li>Organizations</li>
+                <li>Post_Analytics</li>
+                <li>Post_Interactions</li>
+                <li>Password_requests</li>
+                <li>Followers</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>User Credentials</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Access Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Admin 1</td>
+                        <td>superadmin01@konnectr.com</td>
+                        <td>Qwerty@123</td>
+                        <td>Full</td>
+                    </tr>
+                    <tr>
+                        <td>Admin 2</td>
+                        <td>admin02@konnectr.com</td>
+                        <td>Qwerty@123</td>
+                        <td>Full</td>
+                    </tr>
+                    <tr>
+                        <td>Student</td>
+                        <td>paone@zurich.edu</td>
+                        <td>Qwerty@123</td>
+                        <td>Moderate</td>
+                    </tr>
+                    <tr>
+                        <td>Company Recruiter</td>
+                        <td>harithra@google.com</td>
+                        <td>Qwerty@123</td>
+                        <td>Moderate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="content-section">
+            <h2>KonnectR Platform Overview</h2>
+            <h3>User and Admin Interfaces</h3>
+            <h4>User Interface:</h4>
+            <ul>
+                <li><strong>Post Management:</strong> Users can create and manage their posts.</li>
+                <li><strong>Networking:</strong> Users can connect with other users, build their network, and engage in messaging to share thoughts.</li>
+                <li><strong>Profile Management:</strong> Users can update certain fields in their profiles to keep information current.</li>
+            </ul>
+            <h4>Admin Interface:</h4>
+            <ul>
+                <li><strong>Platform Monitoring:</strong> The admin has full control over the platform, with the ability to monitor user and application traffic.</li>
+                <li><strong>User and Post Management:</strong> The admin can modify user statuses, manage post statistics, and oversee platform activities.</li>
+                <li><strong>Data Insights:</strong> The admin dashboard provides data insights, allowing the admin to observe trends and analyze platform metrics.</li>
+            </ul>
+            <h3>Tech Stack</h3>
+            <ul>
+                <li>Backend: Python Flask</li>
+                <li>Frontend: HTML, CSS, JavaScript, Bootstrap</li>
+                <li>Database: MySQL</li>
+                <li>Charts: Plotly.js</li>
+                <li>Date Handling: Moment.js</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Platform Features</h2>
+            <ul>
+                <li>Role-based access control</li>
+                <li>Real-time messaging</li>
+                <li>Advanced search and filtering</li>
+                <li>Analytics dashboard</li>
+                <li>Password reset management</li>
+                <li>User profile management</li>
+                <li>Post moderation system</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Security Features</h2>
+            <ul>
+                <li>Password hashing (MD5)</li>
+                <li>Session management</li>
+                <li>Input validation</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Installation & Setup</h2>
+            <ol>
+                <li>Clone repository
+                    <pre><code>git clone [repository-url]</code></pre>
+                    <pre><code>cd KonnectR</code></pre>
+                </li>
+                <li>Create virtual environment
+                    <pre><code>python -m venv venv</code></pre>
+                    <pre><code>source venv/bin/activate  # Linux/Mac</code></pre>
+                    <pre><code>venv\Scripts\activate     # Windows</code></pre>
+                </li>
+                <li>Install dependencies
+                    <pre><code>pip install -r requirements.txt</code></pre>
+                </li>
+                <li>Configure database
+                    <pre><code># Update Config.yaml with your database credentials</code></pre>
+                    <pre><code>mysql -u root -p < schema.sql</code></pre>
+                </li>
+                <li>Run application
+                    <pre><code>python app.py</code></pre>
+                </li>
+            </ol>
+        </section>
+
+        <section class="content-section">
+            <h2>Project Structure</h2>
+            <pre><code>
+KONNECTR/
+├── static/                  # Static assets
+│   ├── CSS/                # Stylesheets
+│   ├── JS/                 # JavaScript files
+│   └── img/                # Images
+├── templates/              # HTML templates
+├── *.py                    # Python backend files
+└── requirements.txt        # Dependencies
+            </code></pre>
+        </section>
+
+        <footer class="text-center">
+            <p>License: MIT License</p>
+            <p>Acknowledgments:</p>
+            <ul>
+                <li>Bootstrap for UI components</li>
+                <li>Plotly.js for analytics visualization</li>
+                <li>Flask community for excellent documentation</li>
+            </ul>
+            <p>Contact:</p>
+            <ul>
+                <li>Email: <a href="mailto:pavanyellathakota@gmail.com">pavanyellathakota@gmail.com</a></li>
+                <li>GitHub: <a href="https://github.com/PavanYellathakota">https://github.com/PavanYellathakota</a></li>
+                <li>LinkedIn: <a href="https://www.linkedin.com/in/pavanyellathakota/">https://www.linkedin.com/in/pavanyellathakota/</a></li>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
